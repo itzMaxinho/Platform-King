@@ -10,56 +10,66 @@ public class PlayerMovement : MonoBehaviour
     private Animator anim;
     private bool grounded;
     private BoxCollider2D boxCollider;
-    private float wallJumpCooldown;
     private float horizontalInput;
+    private bool doubleJump;
 
     private void Awake()
     {  
-        // grab refrences
         body = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-        boxCollider = GetComponent<BoxCollider2D>();}
+        boxCollider = GetComponent<BoxCollider2D>();
+    }
 
     void Update()
     {
         horizontalInput = Input.GetAxis("Horizontal");
 
-        // flip player when moving left
+        // obrot postaci podczas chodzenia
         if (horizontalInput > 0.01f)
             transform.localScale = Vector3.one;
         else if (horizontalInput < -0.01f)
             transform.localScale = new Vector3(-1, 1, 1);
 
-        // set animator parameters
+        // parametry animacji
         anim.SetBool("run", horizontalInput != 0);
         anim.SetBool("grounded", isGrounded());
 
-        // wall jump logic
-        if (wallJumpCooldown > 0.2f)
+        // skakanie
+        Jump();
+
+        // poruszanie siê
+        body.velocity = new Vector2(horizontalInput * speed, body.velocity.y);
+
+        // spadanie ze scian
+        if (onWall() && !isGrounded())
         {
-            body.velocity = new Vector2(horizontalInput * speed, body.velocity.y);
-
-            if (onWall() && !isGrounded())
-            {
-                body.gravityScale = 0;
-                body.velocity = Vector2.zero;
-            }
-            else
-                body.gravityScale = 3;
-
-            if (Input.GetKey(KeyCode.Space))
-                Jump();
+            body.velocity = new Vector2(0, body.velocity.y);
         }
-        else
-            wallJumpCooldown += Time.deltaTime;
     }
 
     void Jump()
     {
-        if (isGrounded())
+        if (isGrounded() && !Input.GetButton("Jump"))
         {
-            body.velocity = new Vector2(body.velocity.x, jumpPower);
-            anim.SetTrigger("jump");
+            doubleJump = false;
+        }
+
+        if (Input.GetButtonDown("Jump"))
+        {
+
+            if (isGrounded() || doubleJump)
+            {
+                body.velocity = new Vector2(body.velocity.x, jumpPower);
+                anim.SetTrigger("jump");
+
+                doubleJump = !doubleJump;
+            }
+
+            if (Input.GetButtonUp("Jump") && body.velocity.y > 0f)
+            {
+                body.velocity = new Vector2(body.velocity.x, body.velocity.y * 0.5f);
+                anim.SetTrigger("jump");
+            }
         }
 
         /*else if (onWall() && !isGrounded())
