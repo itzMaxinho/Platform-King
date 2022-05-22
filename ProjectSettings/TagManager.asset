@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Ground
   - Block
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -16,9 +17,9 @@ TagManager:
   - Ground
   - Wall
   - 
-  - 
-  - 
-  - 
+  - Ruby
+  - Player
+  - Enemy
   - 
   - 
   - 
@@ -42,4 +43,16 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 1330110195
+    locked: 0
+  - name: Player
+    uniqueID: 1558561269
+    locked: 0
+  - name: Ground
+    uniqueID: 1085456511
+    locked: 0
+  - name: Foreground
+    uniqueID: 3609019919
     locked: 0
